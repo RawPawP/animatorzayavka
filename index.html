@@ -1,0 +1,748 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Путь аниматора</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Manrope:wght@400;500;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Макет: шапка со ступенчатой «лестницей» из четырёх блоков → выбор уровня с чек-листом → сравнение → правила → раскадровки → критерии → заявка */
+:root{
+  --bg:#EDF0F6; --surface:#FFFFFF; --surface-2:#E2E7F0; --fg:#0E1829; --muted:#4F5C75; --line:#C9D1DF;
+  --t1:#14803F; --t2:#2159C8; --t3:#C25E00; --t4:#9A6B00; --on-t:#FFFFFF;
+  --stage:#E4EAF4; --skin:#E8B64C; --legs:#4C6896; --eye:#1D2433;
+  --font-display:'Unbounded',system-ui,sans-serif;
+  --font-body:'Manrope',system-ui,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0B1220; --surface:#131C2E; --surface-2:#1B2640; --fg:#E8EDF7; --muted:#9AA7C0; --line:#27344F;
+    --t1:#4CD38A; --t2:#79A8FF; --t3:#FFA24D; --t4:#F5C94D; --on-t:#0B1220;
+    --stage:#0D1626; --skin:#F0C25A; --legs:#5F80B8; --eye:#1D2433; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0B1220; --surface:#131C2E; --surface-2:#1B2640; --fg:#E8EDF7; --muted:#9AA7C0; --line:#27344F;
+  --t1:#4CD38A; --t2:#79A8FF; --t3:#FFA24D; --t4:#F5C94D; --on-t:#0B1220;
+  --stage:#0D1626; --skin:#F0C25A; --legs:#5F80B8; --eye:#1D2433; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:16px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0;
+}
+.t1{--tc:var(--t1)} .t2{--tc:var(--t2)} .t3{--tc:var(--t3)} .t4{--tc:var(--t4)}
+.wrap{max-width:1120px;margin:0 auto}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--t2);outline-offset:2px}
+.mono{font-family:var(--font-mono)}
+.eyebrow{font-family:var(--font-mono);font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+h1,h2,h3,h4{margin:0;text-wrap:balance}
+h2{font-family:var(--font-display);font-weight:700;font-size:clamp(1.35rem,1rem + 1.5vw,2.05rem);line-height:1.2;letter-spacing:-.01em}
+p{margin:0}
+.lead{color:var(--muted);max-width:62ch}
+
+/* верхняя полоса */
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px 24px;flex-wrap:wrap;padding-block:20px}
+.brand{display:flex;align-items:center;gap:12px;font-family:var(--font-display);font-weight:700;font-size:1rem;text-decoration:none}
+.logo{display:flex;gap:7px;padding:0 3px}
+.logo i{display:block;width:9px;height:9px;transform:rotate(45deg);background:var(--t1)}
+.logo i:nth-child(2){background:var(--t2)} .logo i:nth-child(3){background:var(--t3)}
+.nav{display:flex;gap:6px 18px;flex-wrap:wrap;font-family:var(--font-mono);font-size:.8rem}
+.nav a{text-decoration:none;color:var(--muted);padding:4px 0;border-bottom:2px solid transparent}
+.nav a:hover{color:var(--fg);border-color:var(--fg)}
+
+/* шапка */
+.hero{
+  display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:end;padding-block:28px 64px;position:relative;
+}
+.hero::before{
+  content:"";position:absolute;inset:0 -8px 0 -8px;z-index:-1;
+  background-image:radial-gradient(circle,var(--line) 1.6px,transparent 2.2px);background-size:22px 22px;
+  -webkit-mask-image:linear-gradient(180deg,#000 0%,transparent 90%);mask-image:linear-gradient(180deg,#000 0%,transparent 90%);
+}
+.hero h1{font-family:var(--font-display);font-weight:700;font-size:clamp(1.9rem,1.1rem + 3.6vw,3.6rem);line-height:1.08;letter-spacing:-.02em;margin-bottom:20px}
+.hero .lead{font-size:1.08rem;margin-bottom:28px}
+.cta{display:flex;flex-wrap:wrap;gap:12px}
+.btn{font:inherit;font-weight:700;padding:12px 20px;border:2px solid var(--fg);background:var(--fg);color:var(--bg);border-radius:4px;cursor:pointer;text-decoration:none;display:inline-block;line-height:1.3}
+.btn.ghost{background:transparent;color:var(--fg)}
+.btn:hover{transform:translateY(-1px)}
+.stairs{display:flex;align-items:flex-end;gap:6px;max-width:460px;width:100%;justify-self:end}
+.step{
+  flex:1;min-width:0;height:var(--h);background:var(--tc);color:var(--on-t);position:relative;
+  padding:10px 9px;display:flex;flex-direction:column;justify-content:flex-end;border-radius:3px 3px 0 0;
+}
+.step::before{
+  content:"";position:absolute;left:8px;right:8px;top:-7px;height:7px;border-radius:3px 3px 0 0;
+  background:repeating-linear-gradient(90deg,var(--tc) 0 9px,transparent 9px 15px);
+}
+.step b{font-family:var(--font-display);font-size:1.5rem;line-height:1}
+.step span{font-family:var(--font-mono);font-size:.7rem;margin-top:6px;letter-spacing:.02em}
+
+/* секции */
+section{padding-block:56px}
+.sec-head{display:grid;gap:12px;margin-bottom:28px}
+
+/* выбор уровня */
+.tabs{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}
+.tab{
+  font:inherit;text-align:left;color:var(--fg);background:var(--surface);border:2px solid var(--line);border-top:6px solid var(--tc);
+  border-radius:4px;padding:12px 14px 14px;cursor:pointer;display:flex;flex-direction:column;gap:2px;min-width:0;
+}
+.tab:hover{border-color:var(--tc)}
+.tab[aria-pressed="true"]{border-color:var(--tc);background:color-mix(in srgb,var(--tc) 12%,var(--surface))}
+.tab .tn{font-family:var(--font-mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.tab strong{font-family:var(--font-display);font-weight:500;font-size:.98rem;line-height:1.25}
+.tab .tp{font-family:var(--font-mono);font-size:.76rem;color:var(--muted);margin-top:4px}
+.panel{
+  background:var(--surface);border:2px solid var(--tc);border-radius:4px;margin-top:14px;
+  padding:clamp(18px,3vw,34px);display:grid;grid-template-columns:1.3fr 1fr;gap:clamp(22px,4vw,44px);
+}
+.panel>*{min-width:0}
+.panel h3{font-family:var(--font-display);font-weight:700;font-size:clamp(1.3rem,1rem + 1.2vw,1.8rem);line-height:1.2;color:var(--tc);margin-bottom:10px}
+.panel .tag{font-family:var(--font-mono);font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.panel .lead{margin-bottom:20px}
+.prog{display:flex;align-items:center;gap:12px;font-family:var(--font-mono);font-size:.8rem;margin-bottom:6px}
+.bar{flex:1;height:10px;background:var(--surface-2);border-radius:2px;overflow:hidden}
+.bar i{display:block;height:100%;width:var(--w,0%);background:var(--tc);transition:width .25s}
+.checks{margin-top:10px}
+.chk{display:flex;gap:12px;padding:11px 0;border-top:1px solid var(--line);cursor:pointer;align-items:flex-start}
+.chk input{width:20px;height:20px;accent-color:var(--tc);margin:3px 0 0;flex:none;cursor:pointer}
+.chk span{min-width:0}
+.chk input:checked+span{color:var(--muted)}
+.ready{margin-top:14px;padding:11px 14px;background:color-mix(in srgb,var(--tc) 14%,var(--surface));border-left:5px solid var(--tc);font-weight:700}
+.ready a{color:var(--tc)}
+.side{display:grid;gap:26px;align-content:start}
+.side h4{font-family:var(--font-mono);font-weight:500;font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+ul.sq{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+ul.sq li{position:relative;padding-left:20px}
+ul.sq li::before{content:"";position:absolute;left:0;top:.5em;width:9px;height:9px;background:var(--tc);border-radius:2px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips span{font-family:var(--font-mono);font-size:.76rem;padding:3px 8px;border:1.5px solid var(--line);border-radius:3px;background:var(--bg)}
+
+/* сравнение */
+.scroller{overflow-x:auto;border:2px solid var(--fg);border-radius:4px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:760px;font-size:.93rem}
+th,td{padding:12px 14px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+tr:last-child td,tr:last-child th{border-bottom:0}
+thead th{border-top:6px solid var(--tc);background:var(--surface);font-family:var(--font-display);font-weight:500;font-size:.85rem;line-height:1.25}
+tbody th{font-weight:700;width:19%;background:var(--surface-2)}
+td{width:20%}
+
+/* раскадровки */
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:22px}
+.fbtn{font:inherit;font-family:var(--font-mono);font-size:.82rem;padding:8px 14px;border:2px solid var(--line);background:var(--surface);color:var(--fg);border-radius:4px;cursor:pointer}
+.fbtn[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:16px}
+.work{display:flex;flex-direction:column;background:var(--surface);border:2px solid var(--line);border-radius:4px;overflow:hidden;min-width:0}
+.work .art svg{display:block;width:100%;height:auto}
+.work .meta{padding:14px 16px 16px;display:grid;gap:8px;border-top:5px solid var(--tc)}
+.badge{font-family:var(--font-mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--tc);font-weight:500}
+.work h3{font-family:var(--font-display);font-weight:500;font-size:1rem;line-height:1.3}
+.stats{display:flex;gap:14px;flex-wrap:wrap;font-family:var(--font-mono);font-size:.78rem;color:var(--muted)}
+.count{font-family:var(--font-mono);font-size:.8rem;color:var(--muted);margin-top:14px}
+.anim .bg{fill:var(--stage)}
+.anim .gnd{stroke:var(--muted);stroke-width:2;opacity:.45}
+.anim .shd{fill:#000;opacity:.2}
+.anim .p-head,.anim .p-arm{fill:var(--skin)}
+.anim .p-arm.far{fill:color-mix(in srgb,var(--skin) 70%,#000)}
+.anim .p-torso{fill:var(--tc)}
+.anim .p-leg{fill:var(--legs)}
+.anim .p-leg.far{fill:color-mix(in srgb,var(--legs) 68%,#000)}
+.anim .p-eye{fill:var(--eye)}
+.anim .tl{stroke:var(--muted);stroke-width:2;opacity:.5}
+.anim .kf{fill:var(--tc)}
+.anim .tt,.anim .fn{fill:var(--muted);font-family:var(--font-mono);font-size:10px}
+
+/* правила и критерии */
+.crit{border-top:2px solid var(--fg)}
+.crow{display:grid;grid-template-columns:230px 1fr;gap:8px 24px;padding:18px 0;border-bottom:1px solid var(--line)}
+.crow h3{font-family:var(--font-display);font-weight:500;font-size:1rem;margin-bottom:4px}
+.crow p{color:var(--muted);max-width:68ch}
+.crow p.mono{color:var(--fg);font-size:.82rem}
+
+/* заявка */
+.apply{display:grid;grid-template-columns:1fr 1fr;gap:clamp(22px,4vw,44px);align-items:start}
+.apply>*{min-width:0}
+ol.flow{list-style:none;counter-reset:s;margin:0;padding:0;display:grid;gap:0}
+ol.flow li{counter-increment:s;position:relative;padding:0 0 22px 52px}
+ol.flow li::before{
+  content:counter(s);position:absolute;left:0;top:0;width:34px;height:34px;display:grid;place-items:center;
+  background:var(--fg);color:var(--bg);font-family:var(--font-display);font-weight:700;border-radius:4px;
+}
+ol.flow li::after{content:"";position:absolute;left:16px;top:38px;bottom:4px;width:2px;background:var(--line)}
+ol.flow li:last-child::after{display:none}
+ol.flow strong{display:block;margin-bottom:2px}
+ol.flow span{color:var(--muted)}
+.tpl{background:var(--surface);border:2px solid var(--fg);border-radius:4px;overflow:hidden}
+.tpl header{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 14px;background:var(--surface-2);border-bottom:2px solid var(--fg);font-family:var(--font-mono);font-size:.8rem}
+.tpl .btn{padding:6px 12px;font-size:.82rem;font-family:var(--font-mono)}
+.tpl pre{margin:0;padding:16px;font-family:var(--font-mono);font-size:.84rem;line-height:1.7;white-space:pre-wrap;overflow-wrap:anywhere}
+footer{padding-block:36px 56px;border-top:2px solid var(--fg);color:var(--muted);font-size:.9rem;display:grid;gap:8px}
+
+@media (max-width:860px){
+  .hero{grid-template-columns:1fr;gap:34px;padding-bottom:40px}
+  .stairs{justify-self:start}
+  .panel,.apply{grid-template-columns:1fr}
+  .crow{grid-template-columns:1fr}
+  section{padding-block:40px}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .btn:hover{transform:none}
+  .bar i{transition:none}
+}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="#top-of-page"><span class="logo" aria-hidden="true"><i></i><i></i><i></i></span>Путь аниматора</a>
+    <nav class="nav" aria-label="Разделы">
+      <a href="#roles">Роли</a><a href="#compare">Сравнение</a><a href="#rules">Правила</a><a href="#works">Примеры работ</a><a href="#criteria">Критерии</a><a href="#apply">Заявка</a>
+    </nav>
+  </header>
+
+  <main id="top-of-page">
+    <div class="hero">
+      <div>
+        <p class="eyebrow">Roblox Studio · Animation Editor · система ролей</p>
+        <h1>Путь аниматора от первой позы до топа</h1>
+        <p class="lead">Четыре роли: начинающий, средний, продвинутый и топовый аниматор. Для каждой есть список требований, примеры работ и шаблон заявки. Отмечай выполненное и смотри, сколько осталось до следующей роли.</p>
+        <div class="cta">
+          <a class="btn" href="#roles">Выбрать роль</a>
+          <a class="btn ghost" href="#works">Смотреть примеры работ</a>
+        </div>
+      </div>
+      <div class="stairs" aria-hidden="true">
+        <div class="step t1" style="--h:92px"><b>1</b><span>Начало</span></div>
+        <div class="step t2" style="--h:140px"><b>2</b><span>Средний</span></div>
+        <div class="step t3" style="--h:190px"><b>3</b><span>Продвин.</span></div>
+        <div class="step t4" style="--h:244px"><b>4</b><span>Топ</span></div>
+      </div>
+    </div>
+
+    <section id="roles">
+      <div class="sec-head">
+        <p class="eyebrow">Требования</p>
+        <h2>Что нужно для каждой роли</h2>
+        <p class="lead">Выбери уровень и отмечай пункты, которые уже выполнены. Отметки сохраняются в этом браузере.</p>
+      </div>
+      <div class="tabs" id="tabs"></div>
+      <div class="panel" id="panel"></div>
+    </section>
+
+    <section id="compare">
+      <div class="sec-head">
+        <p class="eyebrow">Сравнение</p>
+        <h2>Четыре роли рядом</h2>
+      </div>
+      <div class="scroller">
+        <table>
+          <thead>
+            <tr>
+              <th></th>
+              <th class="t1">Начинающий</th>
+              <th class="t2">Средний</th>
+              <th class="t3">Продвинутый</th>
+              <th class="t4">Топовый</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><th>Анимаций в портфолио</th><td>5</td><td>8</td><td>12</td><td>20</td></tr>
+            <tr><th>Что умеешь анимировать</th><td>Простые действия и позы</td><td>Ходьба, бег, прыжок, удар</td><td>Полные наборы персонажа</td><td>Катсцены и лицевая анимация</td></tr>
+            <tr><th>Тайминг и easing</th><td>Linear, без рывков</td><td>Минимум 3 стиля easing</td><td>Свой тайминг под вес и инерцию</td><td>Плавные переходы между состояниями</td></tr>
+            <tr><th>Инструменты</th><td>Animation Editor</td><td>Animation Editor, IK, Moon Animator</td><td>Moon Animator, Blender</td><td>Blender, риги, Dynamic Head</td></tr>
+            <tr><th>Интеграция в игру</th><td>Animation ID</td><td>Animation Events, Priority</td><td>Слои и маски тела</td><td>Проверка на 60 FPS и на телефоне</td></tr>
+            <tr><th>Как проверяют</th><td>5 видео и Animation ID</td><td>8 видео и открытый Place</td><td>Наборы, разборы, Place</td><td>Place, катсцена и тестовое на 48 часов</td></tr>
+            <tr><th>Анимации из каталога</th><td>Запрещены</td><td>Запрещены</td><td>Запрещены</td><td>Запрещены</td></tr>
+            <tr><th>Повторная заявка после отказа</th><td>через 7 дней</td><td>через 14 дней</td><td>через 21 день</td><td>через 30 дней</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="rules">
+      <div class="sec-head">
+        <p class="eyebrow">Правила</p>
+        <h2>Строгие правила выдачи ролей</h2>
+        <p class="lead">Эти условия действуют для всех уровней. Нарушение любого пункта ведёт к отказу.</p>
+      </div>
+      <div class="crit">
+        <div class="crow"><div><h3>Только своё</h3><p class="mono">Запрещено: каталог, чужие анимации</p></div><p>Все анимации сделаны тобой. Готовые анимации из каталога и Toolbox, чужие Animation ID и копии чужих работ кадр в кадр считаются плагиатом. Если это подтвердилось, заявку отклоняют и закрывают подачу на 30 дней.</p></div>
+        <div class="crow"><div><h3>Права на Animation ID</h3><p class="mono">ID принадлежит тебе или группе</p></div><p>Каждая анимация должна быть опубликована с твоего аккаунта или от имени твоей группы. Заявки с чужими ID не рассматривают.</p></div>
+        <div class="crow"><div><h3>Роли по порядку</h3><p class="mono">Нельзя пропускать уровни</p></div><p>Сначала начинающий, потом средний и так далее. Заявку на следующую роль можно подать не раньше чем через 14 дней после получения предыдущей.</p></div>
+        <div class="crow"><div><h3>Одна попытка за срок</h3><p class="mono">7 / 14 / 21 / 30 дней</p></div><p>После отказа повторную заявку принимают только через срок из таблицы выше. Заявки, поданные раньше, не рассматривают.</p></div>
+        <div class="crow"><div><h3>Живая проверка</h3><p class="mono">Правки за 15 минут</p></div><p>Модератор вправе открыть твою анимацию в редакторе и попросить внести изменение: сдвинуть ключ, поменять easing, исправить цикл. Отказ или неспособность сделать правку приравниваются к отказу в роли.</p></div>
+        <div class="crow"><div><h3>Все пункты обязательны</h3><p class="mono">Без исключений</p></div><p>Роль выдают только при выполнении каждого пункта чек-листа. Если не хватает одного, заявку отклоняют, даже когда остальное сделано отлично.</p></div>
+        <div class="crow"><div><h3>Роль можно потерять</h3><p class="mono">Активность 60 дней</p></div><p>Роль снимают за плагиат, обман при проверке и нарушение правил сервера. Со среднего уровня и выше нужна активность: минимум одна новая анимация за 60 дней, иначе роль понижают на один уровень.</p></div>
+      </div>
+    </section>
+
+    <section id="works">
+      <div class="sec-head">
+        <p class="eyebrow">Примеры работ</p>
+        <h2>Как выглядит каждый уровень</h2>
+        <p class="lead">Две анимации на роль в виде раскадровки. Фигурки показывают ключевые позы, а таймлайн внизу показывает, в какой момент каждая из них стоит. Число ключей и длина указаны как ориентир.</p>
+      </div>
+      <div class="filters" id="filters">
+        <button class="fbtn" type="button" data-f="all" aria-pressed="true">Все</button>
+        <button class="fbtn" type="button" data-f="t1" aria-pressed="false">Начинающий</button>
+        <button class="fbtn" type="button" data-f="t2" aria-pressed="false">Средний</button>
+        <button class="fbtn" type="button" data-f="t3" aria-pressed="false">Продвинутый</button>
+        <button class="fbtn" type="button" data-f="t4" aria-pressed="false">Топовый</button>
+      </div>
+
+      <div class="gallery" id="gallery">
+
+        <article class="work t1" data-tier="t1" data-ex="wave">
+          <div class="art"></div>
+          <div class="meta">
+            <span class="badge">Начинающий</span>
+            <h3>Приветствие взмахом</h3>
+            <p class="stats"><span>≈ 3 ключа</span><span>0,8 с</span></p>
+            <p class="chips"><span>Animation Editor</span><span>Rotate</span><span>Loop</span></p>
+          </div>
+        </article>
+
+        <article class="work t1" data-tier="t1" data-ex="walk">
+          <div class="art"></div>
+          <div class="meta">
+            <span class="badge">Начинающий</span>
+            <h3>Ходьба: ключевые позы</h3>
+            <p class="stats"><span>≈ 3 позы</span><span>0,6 с</span></p>
+            <p class="chips"><span>R15</span><span>Contact</span><span>Passing</span></p>
+          </div>
+        </article>
+
+        <article class="work t2" data-tier="t2" data-ex="jump">
+          <div class="art"></div>
+          <div class="meta">
+            <span class="badge">Средний</span>
+            <h3>Прыжок с замахом</h3>
+            <p class="stats"><span>≈ 4 ключа</span><span>0,8 с</span></p>
+            <p class="chips"><span>Easing</span><span>Антиципация</span><span>Animation Events</span></p>
+          </div>
+        </article>
+
+        <article class="work t2" data-tier="t2" data-ex="punch">
+          <div class="art"></div>
+          <div class="meta">
+            <span class="badge">Средний</span>
+            <h3>Удар кулаком</h3>
+            <p class="stats"><span>≈ 3 ключа</span><span>0,35 с</span></p>
+            <p class="chips"><span>Замах</span><span>Оседание</span><span>Priority: Action</span></p>
+          </div>
+        </article>
+
+        <article class="work t3" data-tier="t3" data-ex="run">
+          <div class="art"></div>
+          <div class="meta">
+            <span class="badge">Продвинутый</span>
+            <h3>Цикл бега</h3>
+            <p class="stats"><span>≈ 8 поз в цикле</span><span>0,5 с</span></p>
+            <p class="chips"><span>Перенос веса</span><span>Seamless loop</span><span>Movement</span></p>
+          </div>
+        </article>
+
+        <article class="work t3" data-tier="t3" data-ex="surprise">
+          <div class="art"></div>
+          <div class="meta">
+            <span class="badge">Продвинутый</span>
+            <h3>Эмоция: удивление</h3>
+            <p class="stats"><span>≈ 3 ключа</span><span>0,6 с</span></p>
+            <p class="chips"><span>Антиципация</span><span>Акцент</span><span>Оседание</span></p>
+          </div>
+        </article>
+
+        <article class="work t4" data-tier="t4" data-ex="flip">
+          <div class="art"></div>
+          <div class="meta">
+            <span class="badge">Топовый</span>
+            <h3>Сальто назад</h3>
+            <p class="stats"><span>≈ 4 позы</span><span>0,8 с</span></p>
+            <p class="chips"><span>Blender</span><span>IK</span><span>Cubic</span></p>
+          </div>
+        </article>
+
+        <article class="work t4" data-tier="t4" data-ex="kick">
+          <div class="art"></div>
+          <div class="meta">
+            <span class="badge">Топовый</span>
+            <h3>Удар ногой с отведением</h3>
+            <p class="stats"><span>≈ 4 ключа</span><span>0,7 с</span></p>
+            <p class="chips"><span>Moon Animator</span><span>Blending</span><span>Markers</span></p>
+          </div>
+        </article>
+
+      </div>
+      <p class="count" id="count" aria-live="polite"></p>
+    </section>
+
+    <section id="criteria">
+      <div class="sec-head">
+        <p class="eyebrow">Критерии</p>
+        <h2>На что смотрят при проверке</h2>
+        <p class="lead">Эти шесть пунктов проверяют на любом уровне. Если два пункта ниже нормы, заявку отклоняют. Чем выше роль, тем строже оценка.</p>
+      </div>
+      <div class="crit">
+        <div class="crow"><div><h3>Тайминг и спейсинг</h3></div><p>Позы стоят на нужном расстоянии друг от друга. Быстрые движения короткие, медленные длинные, нет равномерного роботного движения.</p></div>
+        <div class="crow"><div><h3>Позы и силуэт</h3></div><p>Поза читается по одному силуэту. У каждого ключевого кадра есть понятная линия действия.</p></div>
+        <div class="crow"><div><h3>Принципы анимации</h3></div><p>В экшене есть антиципация перед ударом, акцент в момент действия и оседание после него. Части тела двигаются с перекрытием, а не одновременно.</p></div>
+        <div class="crow"><div><h3>Вес</h3></div><p>Виден центр масс и перенос веса. Приземление амортизируется, а тяжёлые движения набирают скорость постепенно.</p></div>
+        <div class="crow"><div><h3>Циклы</h3></div><p>Первый и последний кадр совпадают, при зацикливании нет рывка. Ходьба и бег не подпрыгивают и не скользят.</p></div>
+        <div class="crow"><div><h3>Чистота</h3></div><p>Нет вывернутых суставов, дрожания и лишних ключей. Animation Priority выставлен верно, анимации не перебивают друг друга.</p></div>
+      </div>
+    </section>
+
+    <section id="apply">
+      <div class="sec-head">
+        <p class="eyebrow">Заявка</p>
+        <h2>Как получить роль</h2>
+      </div>
+      <div class="apply">
+        <ol class="flow">
+          <li><strong>Выбери роль</strong><span>Пройди чек-лист выше и отметь, что уже выполнено.</span></li>
+          <li><strong>Собери портфолио</strong><span>Видео анимаций, Animation ID и ссылка на Place. Для каждой анимации укажи длину и число ключей.</span></li>
+          <li><strong>Отправь заявку</strong><span>Скопируй шаблон справа, заполни все поля и отправь модераторам. Заявки с пустыми полями не рассматривают.</span></li>
+          <li><strong>Получи решение</strong><span>Модераторы выдадут роль или напишут причину отказа. Повторная заявка возможна только после срока из правил.</span></li>
+        </ol>
+        <div class="tpl">
+          <header><span>Шаблон заявки</span><button class="btn" type="button" id="copy">Скопировать</button></header>
+          <pre id="tpl" tabindex="0">Заявка на роль: Средний аниматор
+Ник в Roblox:
+Анимации (видео, Animation ID, ссылка на Place):
+1.
+2.
+3.
+Самая сложная анимация (длина, число ключей, сколько часов):
+Какие инструменты использовал:
+Что хочу улучшить дальше:
+Подтверждаю: все анимации мои, без каталога и Toolbox, Animation ID принадлежат мне или моей группе</pre>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Требования и сроки можно подогнать под ваш сервер. Раскадровки в галерее нарисованы схематично и показывают уровень сложности, а не готовые анимации.</p>
+    <p class="mono" id="copy-status" aria-live="polite"></p>
+  </footer>
+</div>
+
+<script>
+(function () {
+  var ROLES = [
+    {
+      id: 't1', name: 'Начинающий аниматор', tag: 'Первые анимации',
+      lead: 'Ты освоил Animation Editor и делаешь простые читаемые анимации без подсказок.',
+      reqs: [
+        'Умеешь создать риг R15 или R6 через Rig Builder и открыть его в Animation Editor',
+        'Работаешь с ключевыми кадрами: таймлайн, Pose, Rotate, Preview',
+        'Сделал минимум 5 законченных анимаций: взмах рукой, ходьба, прыжок, приветствие, удар',
+        'В каждой анимации не меньше 3 разных поз, нет резких «телепортов» между кадрами',
+        'Анимации, которые должны повторяться, зациклены без рывка (Loop)',
+        'Каждая анимация опубликована и имеет Animation ID, запускается в игре',
+        'Ни одной готовой анимации из каталога или Toolbox'
+      ],
+      submit: ['5 видео или GIF по 5–10 секунд', 'Animation ID каждой анимации', 'Скриншот Animation Editor с таймлайном', 'Ник в Roblox и ссылка на Place для проверки'],
+      perks: ['Роль «Начинающий аниматор»', 'Доступ к каналу для разбора анимаций', 'Право показывать анимации в общем канале'],
+      tools: ['Rig Builder', 'Animation Editor', 'R15', 'Keyframe', 'Loop', 'Animation ID']
+    },
+    {
+      id: 't2', name: 'Средний аниматор', tag: 'Живое движение',
+      lead: 'Ты анимируешь действия с весом и ритмом и умеешь встраивать анимации в игру.',
+      reqs: [
+        'Минимум 8 законченных анимаций, среди них цикл ходьбы и цикл бега',
+        'Используешь не меньше 3 стилей easing, не оставляешь всё на Linear',
+        'В каждой экшен-анимации есть антиципация, акцент и оседание',
+        'Циклы бесшовные: первый и последний кадр совпадают',
+        'Выставил Animation Priority (Idle, Movement, Action) так, что анимации не перебивают друг друга',
+        'Расставил Animation Events: шаг, удар, момент для звука и эффекта',
+        'Освоил IK или Moon Animator, суставы не выворачиваются',
+        'Ни одной анимации из каталога, любые чужие ресурсы указаны в заявке'
+      ],
+      submit: ['8 видео с анимациями', 'Animation ID каждой анимации', 'Скриншот с расставленными Animation Events', 'Открытый для проверки Place'],
+      perks: ['Роль «Средний аниматор»', 'Участие в командных проектах сервера', 'Право оценивать работы новичков'],
+      tools: ['Easing', 'IK', 'Moon Animator', 'Animation Events', 'Animation Priority', 'Motor6D']
+    },
+    {
+      id: 't3', name: 'Продвинутый аниматор', tag: 'Персонаж и экшен',
+      lead: 'Ты делаешь полные наборы анимаций, в которых чувствуются вес, инерция и характер.',
+      reqs: [
+        'В портфолио от 12 анимаций, из них два полных набора: движение (idle, walk, run, jump, fall, land) и бой (стойка, три удара, блок, смерть)',
+        'Идеальные циклы ходьбы и бега: виден перенос веса и работа центра масс',
+        'Работаешь в Moon Animator или Blender и импортируешь анимации в Roblox',
+        'Делишь анимации по слоям: ноги в Movement, руки и корпус в Action',
+        'События и маркеры синхронизированы с кадрами: удар попадает в нужный момент',
+        'Анимируешь нестандартные риги на Motor6D, не только R15',
+        'Нет дрожания и лишних ключей, кривые чистые',
+        'Дал не меньше 5 подробных разборов чужих анимаций',
+        'Участвовал минимум в одном командном проекте и согласовывал анимации со скриптером'
+      ],
+      submit: ['Видео двух полных наборов', 'Animation ID всех анимаций набора', 'Скриншоты слоёв и приоритетов', 'Ссылки на 5 разборов'],
+      perks: ['Роль «Продвинутый аниматор»', 'Приоритет в заказах и проектах', 'Право проводить разборы анимаций'],
+      tools: ['Moon Animator', 'Blender', 'Motor6D', 'Animation Priority', 'Markers', 'Кривые easing']
+    },
+    {
+      id: 't4', name: 'Топовый аниматор', tag: 'Уровень игр',
+      lead: 'Твои анимации выглядят как в популярных играх: свой стиль, плавные переходы и стабильная работа.',
+      reqs: [
+        'В портфолио от 20 анимаций с узнаваемым общим стилем',
+        'Есть опубликованный Place, где твои анимации работают в геймплее',
+        'Сделал полный набор для персонажа или врага: боёвка, эмоции, взаимодействие',
+        'Сделал катсцену с несколькими персонажами и камерой',
+        'Работаешь в Blender: риг, IK, экспорт в Roblox без потери качества',
+        'Делаешь лицевую анимацию на Dynamic Head',
+        'Переходы между состояниями плавные, нет подёргиваний, проверено на 60 FPS и на телефоне',
+        'Ведёшь документацию набора: список анимаций, названия, ID, приоритеты, длительность',
+        'Выполнил тестовое задание за 48 часов: пять анимаций по описанию персонажа без каталога, их оценивают три модератора',
+        'За последние 3 месяца нет нарушений правил сервера и дал не меньше 10 разборов'
+      ],
+      submit: ['Ссылка на опубликованный Place', 'Видео катсцены и полного набора', 'Таблица анимаций с ID, приоритетами и длиной', 'Результат тестового задания'],
+      perks: ['Роль «Топовый аниматор»', 'Место в команде проектов сервера', 'Право вести заказы и наставлять других', 'Особый цвет роли'],
+      tools: ['Blender', 'IK', 'Dynamic Head', 'Moon Animator', 'Animation Priority', 'Blending']
+    }
+  ];
+
+  var KEY = 'pa-checks';
+  function load() { try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { return {}; } }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+  var state = load();
+  var current = 't1';
+
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function role(id) { return ROLES.filter(function (r) { return r.id === id; })[0]; }
+  function checked(id) { var a = state[id]; return Array.isArray(a) ? a : []; }
+  function ul(a) { return '<ul class="sq">' + a.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>'; }
+
+  var tabsEl = document.getElementById('tabs');
+  var panelEl = document.getElementById('panel');
+
+  function renderTabs() {
+    tabsEl.innerHTML = ROLES.map(function (r, i) {
+      return '<button type="button" class="tab ' + r.id + '" data-id="' + r.id + '" aria-pressed="' + (r.id === current) + '">' +
+        '<span class="tn">Уровень ' + (i + 1) + '</span><strong>' + esc(r.name) + '</strong>' +
+        '<span class="tp" data-tp="' + r.id + '"></span></button>';
+    }).join('');
+    ROLES.forEach(function (r) { updateTabCount(r.id); });
+  }
+  function updateTabCount(id) {
+    var el = tabsEl.querySelector('[data-tp="' + id + '"]');
+    if (el) el.textContent = checked(id).length + ' из ' + role(id).reqs.length + ' требований';
+  }
+
+  function renderPanel() {
+    var r = role(current), done = checked(current);
+    panelEl.className = 'panel ' + r.id;
+    panelEl.innerHTML =
+      '<div>' +
+        '<p class="tag">' + esc(r.tag) + '</p>' +
+        '<h3>' + esc(r.name) + '</h3>' +
+        '<p class="lead">' + esc(r.lead) + '</p>' +
+        '<div class="prog"><div class="bar"><i id="barfill"></i></div><span id="progtxt"></span></div>' +
+        '<div class="checks">' + r.reqs.map(function (q, i) {
+          return '<label class="chk"><input type="checkbox" id="chk-' + r.id + '-' + i + '" data-i="' + i + '"' + (done.indexOf(i) > -1 ? ' checked' : '') + '><span>' + esc(q) + '</span></label>';
+        }).join('') + '</div>' +
+        '<div id="ready" aria-live="polite"></div>' +
+      '</div>' +
+      '<div class="side">' +
+        '<div><h4>Что приложить к заявке</h4>' + ul(r.submit) + '</div>' +
+        '<div><h4>Что получаешь</h4>' + ul(r.perks) + '</div>' +
+        '<div><h4>Инструменты</h4><div class="chips">' + r.tools.map(function (t) { return '<span>' + esc(t) + '</span>'; }).join('') + '</div></div>' +
+      '</div>';
+    updateProgress();
+  }
+
+  function updateProgress() {
+    var r = role(current), n = checked(current).length, total = r.reqs.length;
+    var pct = Math.round(n / total * 100);
+    var fill = document.getElementById('barfill');
+    if (fill) fill.style.setProperty('--w', pct + '%');
+    var txt = document.getElementById('progtxt');
+    if (txt) txt.textContent = n + ' из ' + total + ' · ' + pct + '%';
+    var ready = document.getElementById('ready');
+    if (ready) {
+      ready.innerHTML = n === total ? '<p class="ready">Все требования выполнены. Можно <a href="#apply">подавать заявку</a>.</p>' : '';
+    }
+    updateTabCount(current);
+  }
+
+  tabsEl.addEventListener('click', function (e) {
+    var b = e.target.closest('.tab');
+    if (!b) return;
+    current = b.getAttribute('data-id');
+    Array.prototype.forEach.call(tabsEl.querySelectorAll('.tab'), function (t) {
+      t.setAttribute('aria-pressed', String(t.getAttribute('data-id') === current));
+    });
+    renderPanel();
+  });
+
+  panelEl.addEventListener('change', function (e) {
+    var inp = e.target;
+    if (!inp || inp.type !== 'checkbox') return;
+    var i = Number(inp.getAttribute('data-i'));
+    var a = checked(current).slice();
+    var at = a.indexOf(i);
+    if (inp.checked && at === -1) a.push(i);
+    if (!inp.checked && at > -1) a.splice(at, 1);
+    state[current] = a;
+    save();
+    updateProgress();
+  });
+
+  renderTabs();
+  renderPanel();
+
+  /* раскадровки: фигурка из блоков, суставы повёрнуты на заданные углы (в градусах) */
+  var DEF = { rot: 0, lean: 0, head: 0, aL: [6, 0], aR: [-6, 0], lL: [2, 0], lR: [-2, 0], y: 0 };
+  function pose(p, side) {
+    var o = {};
+    for (var k in DEF) o[k] = p && p[k] !== undefined ? p[k] : DEF[k];
+    o.side = side;
+    return o;
+  }
+  function limb(x, y, a1, a2, l1, l2, w, cls) {
+    return '<g transform="translate(' + x + ' ' + y + ') rotate(' + a1 + ')">' +
+      '<rect class="' + cls + '" x="' + (-w / 2) + '" y="0" width="' + w + '" height="' + l1 + '" rx="2.5"/>' +
+      '<g transform="translate(0 ' + l1 + ') rotate(' + a2 + ')">' +
+      '<rect class="' + cls + '" x="' + (-w / 2) + '" y="-1" width="' + w + '" height="' + (l2 + 1) + '" rx="2.5"/></g></g>';
+  }
+  function figure(p) {
+    var sx = p.side ? 3 : 16, hx = p.side ? 3 : 6, tw = p.side ? 16 : 24;
+    var s = '<g transform="translate(0 ' + p.y + ') rotate(' + p.rot + ')">';
+    s += limb(-hx, 0, p.lL[0], p.lL[1], 26, 24, 11, 'p-leg far');
+    s += limb(hx, 0, p.lR[0], p.lR[1], 26, 24, 11, 'p-leg');
+    s += '<g transform="rotate(' + p.lean + ')">';
+    s += limb(-sx, -46, p.aL[0], p.aL[1], 24, 22, 9, 'p-arm far');
+    s += '<rect class="p-torso" x="' + (-tw / 2) + '" y="-52" width="' + tw + '" height="52" rx="2"/>';
+    s += '<g transform="translate(0 -52) rotate(' + p.head + ')"><rect class="p-head" x="-10" y="-22" width="20" height="20" rx="3"/>';
+    s += p.side
+      ? '<rect class="p-eye" x="3" y="-15" width="3" height="4"/>'
+      : '<rect class="p-eye" x="-6" y="-15" width="3" height="4"/><rect class="p-eye" x="3" y="-15" width="3" height="4"/>';
+    s += '</g>';
+    s += limb(sx, -46, p.aR[0], p.aR[1], 24, 22, 9, 'p-arm');
+    s += '</g></g>';
+    return s;
+  }
+  function board(ex) {
+    var W = 360, H = 206, gy = 142, n = ex.frames.length, sc = n > 3 ? 0.8 : 0.92;
+    var out = '<svg class="anim" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + esc(ex.label) + '">';
+    out += '<rect class="bg" width="' + W + '" height="' + H + '"/>';
+    out += '<line class="gnd" x1="10" x2="350" y1="' + gy + '" y2="' + gy + '"/>';
+    out += '<line class="tl" x1="24" x2="336" y1="180" y2="180"/>';
+    ex.frames.forEach(function (f, i) {
+      var cx = W * (i + 0.5) / n, p = pose(f.p, !!ex.side), oy = gy - 50 * sc;
+      var lift = Math.max(0, -p.y), rx = 22 * sc * (1 - Math.min(0.5, lift / 90));
+      out += '<ellipse class="shd" cx="' + cx + '" cy="' + gy + '" rx="' + rx.toFixed(1) + '" ry="3"/>';
+      out += '<g transform="translate(' + cx.toFixed(1) + ' ' + oy.toFixed(1) + ') scale(' + sc + ')">' + figure(p) + '</g>';
+      out += '<text class="fn" x="' + (W * i / n + 8).toFixed(1) + '" y="16">поза ' + (i + 1) + '</text>';
+      out += '<polygon class="kf" points="' + cx.toFixed(1) + ',173 ' + (cx + 7).toFixed(1) + ',180 ' + cx.toFixed(1) + ',187 ' + (cx - 7).toFixed(1) + ',180"/>';
+      out += '<text class="tt" x="' + cx.toFixed(1) + '" y="200" text-anchor="middle">' + f.t + ' с</text>';
+    });
+    return out + '</svg>';
+  }
+
+  var EX = {
+    wave: { label: 'Раскадровка приветствия взмахом: рука опущена, поднята и качнулась', frames: [
+      { t: '0,00', p: {} },
+      { t: '0,40', p: { aR: [-140, 15], head: 6 } },
+      { t: '0,80', p: { aR: [-140, -22], head: -6 } }
+    ] },
+    walk: { side: true, label: 'Ключевые позы ходьбы сбоку: контакт, проходка, контакт на другую ногу', frames: [
+      { t: '0,00', p: { y: 4, lean: 3, lL: [18, 25], lR: [-24, 5], aL: [-28, -18], aR: [22, -10] } },
+      { t: '0,30', p: { y: 0, lean: 2, lL: [-10, 40], lR: [0, 0], aL: [-5, -10], aR: [5, -8] } },
+      { t: '0,60', p: { y: 4, lean: 3, lL: [-24, 5], lR: [18, 25], aL: [22, -10], aR: [-28, -18] } }
+    ] },
+    jump: { side: true, label: 'Раскадровка прыжка: присед, толчок, верхняя точка, приземление', frames: [
+      { t: '0,00', p: { y: 17, lean: 25, head: -10, lL: [-55, 95], lR: [-60, 100], aL: [35, -10], aR: [30, -10] } },
+      { t: '0,25', p: { y: -12, lean: 8, lL: [-15, 25], lR: [-18, 30], aL: [-120, -10], aR: [-125, -10] } },
+      { t: '0,50', p: { y: -40, lean: -5, lL: [-60, 80], lR: [-70, 90], aL: [-150, -10], aR: [-155, -10] } },
+      { t: '0,80', p: { y: 15, lean: 20, lL: [-50, 90], lR: [-55, 95], aL: [-60, -20], aR: [-65, -25] } }
+    ] },
+    punch: { side: true, label: 'Раскадровка удара кулаком: замах, удар, возврат в стойку', frames: [
+      { t: '0,00', p: { y: 2, lean: -10, lL: [10, 20], lR: [-20, 15], aR: [50, -120], aL: [-40, -90] } },
+      { t: '0,12', p: { y: 6, lean: 22, lL: [25, 10], lR: [-35, 20], aR: [-90, 0], aL: [20, -60] } },
+      { t: '0,35', p: { y: 1, lean: 5, lL: [8, 10], lR: [-14, 10], aR: [-50, -70], aL: [-35, -90] } }
+    ] },
+    run: { side: true, label: 'Четыре ключевые позы цикла бега: контакт, приседание, проходка, толчок', frames: [
+      { t: '0,00', p: { y: 7, lean: 12, lR: [-38, 18], lL: [35, 70], aR: [40, -90], aL: [-60, -90] } },
+      { t: '0,12', p: { y: 5, lean: 14, lR: [-30, 50], lL: [25, 85], aR: [30, -95], aL: [-45, -95] } },
+      { t: '0,25', p: { y: 0, lean: 12, lR: [0, 10], lL: [-50, 110], aR: [-10, -95], aL: [10, -95] } },
+      { t: '0,37', p: { y: -10, lean: 12, lR: [30, 5], lL: [-65, 100], aR: [-50, -90], aL: [55, -90] } }
+    ] },
+    surprise: { label: 'Раскадровка удивления: приседание, подскок с поднятыми руками, оседание', frames: [
+      { t: '0,00', p: { y: 6, lL: [40, -40], lR: [-40, 40], aL: [15, -10], aR: [-15, 10] } },
+      { t: '0,15', p: { y: -14, lean: -6, head: -8, lL: [14, 5], lR: [-14, -5], aL: [150, -15], aR: [-150, 15] } },
+      { t: '0,60', p: { y: 0, head: 4, lL: [6, 0], lR: [-6, 0], aL: [40, -20], aR: [-40, 20] } }
+    ] },
+    flip: { side: true, label: 'Раскадровка сальто назад: присед, взлёт, группировка в воздухе, раскрытие', frames: [
+      { t: '0,00', p: { y: 17, lean: 25, head: -10, lL: [-55, 95], lR: [-60, 100], aL: [35, -10], aR: [30, -10] } },
+      { t: '0,25', p: { y: -30, rot: -70, lL: [-40, 60], lR: [-45, 65], aL: [-130, -10], aR: [-135, -10] } },
+      { t: '0,50', p: { y: -55, rot: -190, lL: [-95, 115], lR: [-100, 120], aL: [-70, -95], aR: [-75, -100] } },
+      { t: '0,80', p: { y: -22, rot: -330, lL: [-15, 20], lR: [-20, 25], aL: [-130, -10], aR: [-135, -10] } }
+    ] },
+    kick: { side: true, label: 'Раскадровка удара ногой: подъём колена, удар, возврат ноги, стойка', frames: [
+      { t: '0,00', p: { y: 0, lean: -8, lR: [-80, 110], lL: [6, 2], aR: [-40, -90], aL: [-45, -90] } },
+      { t: '0,20', p: { y: 0, lean: -20, lR: [-95, 5], lL: [8, 0], aR: [70, -20], aL: [85, -15] } },
+      { t: '0,40', p: { y: 0, lean: -8, lR: [-70, 105], lL: [6, 2], aR: [-30, -80], aL: [-35, -85] } },
+      { t: '0,70', p: { y: 2, lean: 4, lR: [-22, 18], lL: [14, 12], aR: [-45, -95], aL: [-50, -95] } }
+    ] }
+  };
+  Array.prototype.forEach.call(document.querySelectorAll('#gallery .work'), function (w) {
+    var ex = EX[w.getAttribute('data-ex')], art = w.querySelector('.art');
+    if (ex && art) { try { art.innerHTML = board(ex); } catch (e) {} }
+  });
+
+  /* галерея */
+  var filters = document.getElementById('filters');
+  var works = Array.prototype.slice.call(document.querySelectorAll('#gallery .work'));
+  var countEl = document.getElementById('count');
+  function applyFilter(f) {
+    var shown = 0;
+    works.forEach(function (w) {
+      var ok = f === 'all' || w.getAttribute('data-tier') === f;
+      w.hidden = !ok;
+      if (ok) shown++;
+    });
+    countEl.textContent = 'Показано работ: ' + shown + ' из ' + works.length;
+  }
+  filters.addEventListener('click', function (e) {
+    var b = e.target.closest('.fbtn');
+    if (!b) return;
+    Array.prototype.forEach.call(filters.querySelectorAll('.fbtn'), function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+    applyFilter(b.getAttribute('data-f'));
+  });
+  applyFilter('all');
+
+  /* шаблон заявки */
+  var copyBtn = document.getElementById('copy');
+  var tpl = document.getElementById('tpl');
+  var status = document.getElementById('copy-status');
+  function selectTpl() {
+    try {
+      var r = document.createRange(); r.selectNodeContents(tpl);
+      var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+    } catch (e) {}
+  }
+  copyBtn.addEventListener('click', function () {
+    var text = tpl.innerText;
+    function ok() {
+      copyBtn.textContent = 'Скопировано';
+      status.textContent = 'Шаблон заявки скопирован.';
+      setTimeout(function () { copyBtn.textContent = 'Скопировать'; status.textContent = ''; }, 1800);
+    }
+    function fail() {
+      selectTpl();
+      status.textContent = 'Текст выделен. Нажмите Ctrl+C или «Копировать» в меню.';
+    }
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(ok, fail);
+      } else { fail(); }
+    } catch (e) { fail(); }
+  });
+})();
+</script>
+
+</body></html>
